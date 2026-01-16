@@ -175,47 +175,30 @@ footer{
 
 /* MOBILE */
 @media (max-width: 768px) {
-  /* Header & Navigasi */
-  .nav {
-    flex-direction: column;
-    padding: 10px 0;
-  }
-  
-  nav {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
-
-  nav a {
-    margin-left: 0;
-    font-size: 14px;
-  }
-
-  /* Hero Section */
-  .hero {
-    padding-top: 140px; /* Memberi ruang agar tidak tertutup header */
-    text-align: center;
-    min-height: auto;
-    padding-bottom: 50px;
-  }
-
   .hero-content {
-    grid-template-columns: 1fr; /* Menjadikan satu kolom (gambar di bawah teks) */
-    gap: 30px;
+    display: flex !important;
+    flex-direction: column !important; /* Memaksa susunan vertikal */
+    text-align: center;
+    padding-top: 40px;
   }
 
-  .hero h1 {
-    font-size: 32px; /* Ukuran teks lebih pas untuk HP */
-    line-height: 1.2;
+  .hero-text {
+    order: 1; /* Teks Jual Emas tetap di atas */
+  }
+
+  .hero-text h1 {
+    font-size: 28px !important; /* Perkecil ukuran judul agar tidak berantakan */
+  }
+
+  .hero-image {
+    order: 2; /* Logo pindah ke bawah teks */
+    margin-top: 30px;
   }
 
   .hero-image img {
-    width: 180px; /* Mengecilkan logo di tengah agar proporsional */
-    margin: 0 auto;
+    width: 140px !important; /* Ukuran logo lebih kecil di HP */
   }
-
+}
   /* Testimoni */
   .testimonial-card {
     min-width: 280px;
@@ -232,5 +215,6 @@ footer{
 .float-wa:hover{
   transform:scale(1.08);
 }
+
 
 
