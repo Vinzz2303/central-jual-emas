@@ -174,17 +174,63 @@ footer{
 }
 
 /* MOBILE */
-@media (max-width: 768px){
-  .float-wa{
-    width:56px;
-    height:56px;
-    font-size:32px;
-    bottom:20px;
-    right:20px;
+@media (max-width: 768px) {
+  /* Header & Navigasi */
+  .nav {
+    flex-direction: column;
+    padding: 10px 0;
+  }
+  
+  nav {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  nav a {
+    margin-left: 0;
+    font-size: 14px;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding-top: 140px; /* Memberi ruang agar tidak tertutup header */
+    text-align: center;
+    min-height: auto;
+    padding-bottom: 50px;
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr; /* Menjadikan satu kolom (gambar di bawah teks) */
+    gap: 30px;
+  }
+
+  .hero h1 {
+    font-size: 32px; /* Ukuran teks lebih pas untuk HP */
+    line-height: 1.2;
+  }
+
+  .hero-image img {
+    width: 180px; /* Mengecilkan logo di tengah agar proporsional */
+    margin: 0 auto;
+  }
+
+  /* Testimoni */
+  .testimonial-card {
+    min-width: 280px;
+  }
+
+  /* Social Media */
+  .social-wrap {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
   }
 }
 
 .float-wa:hover{
   transform:scale(1.08);
 }
+
 
