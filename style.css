@@ -190,3 +190,40 @@ footer{
     transform:scale(0.95);
   }
 }
+
+/* =========================
+   MOBILE HERO FIX (WAJIB)
+========================= */
+@media (max-width: 768px){
+
+  .hero{
+    padding-top:100px;
+    min-height:auto;
+  }
+
+  .hero-content{
+    grid-template-columns:1fr;   /* jadi 1 kolom */
+    gap:32px;
+    text-align:left;
+  }
+
+  .hero h1{
+    font-size:34px;
+    line-height:1.2;
+  }
+
+  .hero p{
+    font-size:15px;
+  }
+
+  .hero-image{
+    display:flex;
+    justify-content:center;
+  }
+
+  .hero-image img{
+    width:200px;
+    max-width:100%;
+  }
+}
+
