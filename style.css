@@ -148,73 +148,45 @@ footer{
   padding:30px;
 }
 
-/* FLOATING WHATSAPP BASE */
+/* FLOATING WHATSAPP */
 .float-wa{
-  position:fixed;
-  bottom:26px;
-  right:26px;
+  position: fixed;
+  width:64px;
+  height:64px;
+  bottom:24px;
+  right:24px;
   background:#25D366;
   color:#fff;
   border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
+  font-size:34px;
   z-index:9999;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
-  transition:.3s;
+  transition:transform .25s ease, box-shadow .25s ease;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
 
-/* DESKTOP */
-@media (min-width: 769px){
-  .float-wa{
-    width:70px;
-    height:70px;
-    font-size:40px;
+/* DESKTOP HOVER */
+@media (hover: hover) {
+  .float-wa:hover{
+    transform:scale(1.08);
+    box-shadow:0 12px 28px rgba(0,0,0,.35);
   }
 }
 
 /* MOBILE */
-@media (max-width: 768px) {
-  .hero-content {
-    display: flex !important;
-    flex-direction: column !important; /* Memaksa susunan vertikal */
-    text-align: center;
-    padding-top: 40px;
+@media (max-width: 768px){
+  .float-wa{
+    width:56px;
+    height:56px;
+    font-size:30px;
+    bottom:18px;
+    right:18px;
   }
 
-  .hero-text {
-    order: 1; /* Teks Jual Emas tetap di atas */
-  }
-
-  .hero-text h1 {
-    font-size: 28px !important; /* Perkecil ukuran judul agar tidak berantakan */
-  }
-
-  .hero-image {
-    order: 2; /* Logo pindah ke bawah teks */
-    margin-top: 30px;
-  }
-
-  .hero-image img {
-    width: 140px !important; /* Ukuran logo lebih kecil di HP */
+  /* tap feedback */
+  .float-wa:active{
+    transform:scale(0.95);
   }
 }
-  /* Testimoni */
-  .testimonial-card {
-    min-width: 280px;
-  }
-
-  /* Social Media */
-  .social-wrap {
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
-  }
-}
-
-.float-wa:hover{
-  transform:scale(1.08);
-}
-
-
-
