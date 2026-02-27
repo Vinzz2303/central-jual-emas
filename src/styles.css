@@ -502,8 +502,69 @@ h2{
   background:linear-gradient(135deg,#0c0a0d,#171116);
   color:#fff;
 }
-.social-wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:30px}
 .social h2{font-family:"Playfair Display",Georgia,serif;font-size:32px}
+.contact-grid{
+  margin-top:34px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:20px;
+}
+.contact-panel{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(227,199,122,.18);
+  border-radius:16px;
+  padding:20px;
+}
+.contact-panel h3{
+  font-family:"Playfair Display",Georgia,serif;
+  font-size:24px;
+  margin-bottom:10px;
+}
+.contact-panel p{
+  color:#d6cec2;
+  margin-bottom:6px;
+}
+.sla-list{
+  margin-top:12px;
+  padding-left:20px;
+  display:grid;
+  gap:8px;
+}
+.sla-list li{
+  color:#ddd3c7;
+  font-size:14px;
+}
+.map-frame{
+  width:100%;
+  height:240px;
+  border:0;
+  border-radius:14px;
+  margin-top:12px;
+  box-shadow:0 12px 28px rgba(0,0,0,.26);
+}
+.area-groups{
+  display:grid;
+  gap:12px;
+}
+.area-group h4{
+  color:var(--gold-bright);
+  font-size:14px;
+  letter-spacing:.3px;
+  margin-bottom:8px;
+}
+.area-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.area-chips span{
+  font-size:12px;
+  color:#efe4d2;
+  background:rgba(227,199,122,.14);
+  border:1px solid rgba(227,199,122,.34);
+  border-radius:999px;
+  padding:6px 10px;
+}
 .social-btns a{
   display:block;
   background:var(--gold-bright);
@@ -611,6 +672,7 @@ footer h4, footer h5{color:#fff;margin-bottom:8px}
   .hero-content{grid-template-columns:1fr;gap:36px}
   .hero-visual{justify-self:start}
   .split{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr 1fr}
 }
 
 @media (max-width: 768px){
@@ -635,7 +697,7 @@ footer h4, footer h5{color:#fff;margin-bottom:8px}
   .hero h1{font-size:40px}
   .section{padding:90px 0}
   .testimonial-card{min-width:260px}
-  .social-wrap{flex-direction:column;align-items:flex-start}
+  .contact-grid{grid-template-columns:1fr}
   .float-wa{width:56px;height:56px;font-size:30px;bottom:18px;right:18px}
   .float-wa:active{transform:scale(0.95)}
 }

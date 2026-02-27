@@ -85,41 +85,54 @@ const branches = [
   { city: 'Tangerang - Bekasi', address: 'Layanan area Tangerang dan Bekasi' }
 ];
 
+const serviceAreas = [
+  { region: 'Serang & Sekitar', cities: ['Kota Serang', 'Kabupaten Serang', 'Cilegon'] },
+  { region: 'DKI Jakarta', cities: ['Jakarta Pusat', 'Jakarta Selatan', 'Jakarta Barat', 'Jakarta Timur'] },
+  { region: 'Bogor - Depok', cities: ['Kota Bogor', 'Kabupaten Bogor', 'Depok'] },
+  { region: 'Tangerang - Bekasi', cities: ['Kota Tangerang', 'Tangerang Selatan', 'Kota Bekasi', 'Kabupaten Bekasi'] }
+];
+
+const serviceSla = [
+  'Respon WhatsApp rata-rata kurang dari 5 menit saat jam operasional.',
+  'Konfirmasi estimasi awal dilakukan di hari yang sama.',
+  'Jadwal kunjungan/ketemu diprioritaskan maksimal 24 jam.'
+];
+
 const gallery = [
   {
     title: 'Ruang Tamu VIP',
     tag: 'Private Lounge',
-    image: '/img/gallery/lounge.png',
+    image: '/img/gallery/lounge.webp',
     alt: 'Ruang tamu VIP bernuansa hangat untuk konsultasi privat'
   },
   {
     title: 'Meja Penilaian',
     tag: 'Precision Desk',
-    image: '/img/gallery/assessment.png',
+    image: '/img/gallery/assessment.webp',
     alt: 'Meja penilaian emas dengan timbangan presisi dan alat uji'
   },
   {
     title: 'Area Konsultasi',
     tag: 'Calm & Quiet',
-    image: '/img/gallery/consultation.png',
+    image: '/img/gallery/consultation.webp',
     alt: 'Area konsultasi tenang dengan dokumen transaksi pelanggan'
   },
   {
     title: 'Showcase Kadar',
     tag: 'Verified Purity',
-    image: '/img/gallery/showcase.png',
+    image: '/img/gallery/showcase.webp',
     alt: 'Showcase kadar emas dengan sertifikat verifikasi kemurnian'
   },
   {
     title: 'Spot Foto Premium',
     tag: 'Brand Experience',
-    image: '/img/gallery/brand.png',
+    image: '/img/gallery/brand.webp',
     alt: 'Spot foto premium dengan logo Central Jual Emas'
   },
   {
     title: 'Area Pembayaran',
     tag: 'Instant Transfer',
-    image: '/img/gallery/payment.png',
+    image: '/img/gallery/payment.webp',
     alt: 'Area pembayaran instan menggunakan mesin EDC'
   }
 ];
@@ -688,14 +701,52 @@ export default function App() {
       </section>
 
       <section id="kontak" className="section social">
-        <div className="container social-wrap">
-          <div>
-            <h2>Lihat Aktivitas Kami</h2>
-            <p className="subtitle">Berlokasi di Serang, Banten. Layanan kami menjangkau Jabodetabek setiap hari.</p>
-          </div>
-          <div className="social-btns">
-            <a href="https://www.tiktok.com/@terima.jual_emas">TikTok @centraljualemas</a>
-            <a href="https://www.facebook.com/jualemastanpasurat">Facebook Central Jual Emas</a>
+        <div className="container">
+          <h2>Kontak & Area Layanan</h2>
+          <p className="subtitle">Basis operasional di Serang, Banten. Jangkauan layanan aktif untuk area Jabodetabek dengan jadwal janji temu.</p>
+          <div className="contact-grid">
+            <article className="contact-panel reveal">
+              <h3>Hubungi Kami</h3>
+              <p>WhatsApp: 0852-1954-2001</p>
+              <p>Jam Operasional: 09.00 - 20.00 WIB (Setiap Hari)</p>
+              <ul className="sla-list">
+                {serviceSla.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+              <div className="social-btns">
+                <a href="https://www.tiktok.com/@terima.jual_emas">TikTok @centraljualemas</a>
+                <a href="https://www.facebook.com/jualemastanpasurat">Facebook Central Jual Emas</a>
+              </div>
+            </article>
+
+            <article className="contact-panel reveal" style={{ '--delay': '80ms' }}>
+              <h3>Lokasi Basis</h3>
+              <p>Kota Serang, Banten</p>
+              <iframe
+                className="map-frame"
+                src="https://www.google.com/maps?q=Kota%20Serang%2C%20Banten&output=embed"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Peta lokasi basis layanan Central Jual Emas di Serang"
+              ></iframe>
+            </article>
+
+            <article className="contact-panel reveal" style={{ '--delay': '140ms' }}>
+              <h3>Cakupan Area Layanan</h3>
+              <div className="area-groups">
+                {serviceAreas.map((area) => (
+                  <div key={area.region} className="area-group">
+                    <h4>{area.region}</h4>
+                    <div className="area-chips">
+                      {area.cities.map((city) => (
+                        <span key={city}>{city}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
         </div>
       </section>
