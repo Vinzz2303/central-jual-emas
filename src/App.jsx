@@ -319,7 +319,7 @@ export default function App() {
       const link = target.closest('a[href*="wa.me"]');
       if (!link || typeof window.gtag !== 'function') return;
 
-      const section = link.closest('section[id]')?.id || (link.classList.contains('float-wa') ? 'floating' : 'global');
+      const section = link.closest('section[id]')?.id || 'global';
       const label = link.getAttribute('aria-label') || link.textContent?.trim() || 'whatsapp_link';
 
       window.gtag('event', 'whatsapp_click', {
@@ -790,31 +790,14 @@ export default function App() {
       </footer>
 
       <a
-        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20jual%20emas"
-        className="float-wa"
+        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20konsultasi%20harga%20emas"
+        className="global-cta"
         target="_blank"
         rel="noreferrer"
-        aria-label="Chat WhatsApp"
+        aria-label="Konsultasi utama via WhatsApp"
       >
         <span className="iconify" data-icon="mdi:whatsapp"></span>
-      </a>
-
-      <a
-        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20konsultasi%20cepat"
-        className="mobile-cta"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Konsultasi Cepat via WhatsApp
-      </a>
-
-      <a
-        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20konsultasi%20harga%20emas"
-        className="desktop-cta"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Konsultasi Harga Emas Sekarang
+        Konsultasi WhatsApp Sekarang
       </a>
     </div>
   );
