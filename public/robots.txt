@@ -1,0 +1,4 @@
+﻿User-agent: *
+Allow: /
+
+Sitemap: https://central-jual-emas.netlify.app/sitemap.xml

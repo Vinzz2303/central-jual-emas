@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+ï»¿import React, { useMemo, useRef, useState, useEffect } from 'react';
 
 const services = [
   {
@@ -43,7 +43,7 @@ const faqs = [
   },
   {
     q: 'Berapa lama proses pencairan?',
-    a: 'Rata-rata 10–20 menit setelah penilaian selesai dan disepakati.'
+    a: 'Rata-rata 10-20 menit setelah penilaian selesai dan disepakati.'
   },
   {
     q: 'Apakah harga selalu mengikuti pasar?',
@@ -55,20 +55,73 @@ const faqs = [
   }
 ];
 
+const trustPoints = [
+  {
+    icon: 'mdi:file-document-check-outline',
+    title: 'Transaksi Resmi',
+    desc: 'Setiap transaksi dicatat rapi dengan alur yang jelas.'
+  },
+  {
+    icon: 'mdi:shield-lock-outline',
+    title: 'Privasi Terjaga',
+    desc: 'Data pelanggan dan nominal transaksi dijaga kerahasiaannya.'
+  },
+  {
+    icon: 'mdi:scale-balance',
+    title: 'Uji Kadar Transparan',
+    desc: 'Proses pengecekan kadar dilakukan terbuka di hadapan pelanggan.'
+  },
+  {
+    icon: 'mdi:map-marker-radius-outline',
+    title: 'Basis Serang, Jangkauan Jabodetabek',
+    desc: 'Melayani area Jabodetabek dengan konsultasi dan janji temu.'
+  }
+];
+
 const branches = [
-  { city: 'Jakarta', address: 'Kawasan Premium, Jakarta Pusat' },
-  { city: 'Bandung', address: 'Dago Luxury Avenue' },
-  { city: 'Bekasi', address: 'Grand Galaxy City' },
-  { city: 'Tangerang', address: 'Alam Sutera Boulevard' }
+  { city: 'Serang (Lokasi Utama)', address: 'Kota Serang, Banten' },
+  { city: 'Jakarta', address: 'Layanan area DKI Jakarta' },
+  { city: 'Bogor - Depok', address: 'Layanan area Bogor dan Depok' },
+  { city: 'Tangerang - Bekasi', address: 'Layanan area Tangerang dan Bekasi' }
 ];
 
 const gallery = [
-  { title: 'Ruang Tamu VIP', tag: 'Private Lounge' },
-  { title: 'Meja Penilaian', tag: 'Precision Desk' },
-  { title: 'Area Konsultasi', tag: 'Calm & Quiet' },
-  { title: 'Showcase Kadar', tag: 'Verified Purity' },
-  { title: 'Spot Foto Premium', tag: 'Brand Experience' },
-  { title: 'Area Pembayaran', tag: 'Instant Transfer' }
+  {
+    title: 'Ruang Tamu VIP',
+    tag: 'Private Lounge',
+    image: '/img/gallery/lounge.svg',
+    alt: 'Ilustrasi ruang tamu VIP untuk konsultasi privat'
+  },
+  {
+    title: 'Meja Penilaian',
+    tag: 'Precision Desk',
+    image: '/img/gallery/assessment.svg',
+    alt: 'Ilustrasi meja penilaian emas dengan alat presisi'
+  },
+  {
+    title: 'Area Konsultasi',
+    tag: 'Calm & Quiet',
+    image: '/img/gallery/consultation.svg',
+    alt: 'Ilustrasi area konsultasi dengan suasana tenang'
+  },
+  {
+    title: 'Showcase Kadar',
+    tag: 'Verified Purity',
+    image: '/img/gallery/showcase.svg',
+    alt: 'Ilustrasi showcase kadar emas dengan pencahayaan premium'
+  },
+  {
+    title: 'Spot Foto Premium',
+    tag: 'Brand Experience',
+    image: '/img/gallery/brand.svg',
+    alt: 'Ilustrasi spot foto premium di dalam showroom'
+  },
+  {
+    title: 'Area Pembayaran',
+    tag: 'Instant Transfer',
+    image: '/img/gallery/payment.svg',
+    alt: 'Ilustrasi area pembayaran instan dan aman'
+  }
 ];
 
 const formatIDR = (value) =>
@@ -83,6 +136,8 @@ export default function App() {
   const [karat, setKarat] = useState(24);
   const [pricePerGram, setPricePerGram] = useState(1150000);
   const [openFaq, setOpenFaq] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [estimatorViewed, setEstimatorViewed] = useState(false);
   const trackRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -90,6 +145,21 @@ export default function App() {
     const purity = Math.min(Math.max(karat, 1), 24) / 24;
     return grams * pricePerGram * purity;
   }, [grams, karat, pricePerGram]);
+  const isEstimateValid = grams > 0 && karat >= 1 && karat <= 24 && pricePerGram >= 1000;
+  const estimateNote = !grams
+    ? 'Masukkan berat emas terlebih dahulu.'
+    : karat < 1 || karat > 24
+      ? 'Kadar emas harus di antara 1 sampai 24 karat.'
+      : pricePerGram < 1000
+        ? 'Harga per gram minimal Rp1.000.'
+        : 'Estimasi siap. Lanjutkan konsultasi untuk penilaian final.';
+  const waEstimateText = encodeURIComponent(
+    `Halo Central Jual Emas, saya ingin estimasi harga.\n` +
+      `Berat: ${grams} gram\n` +
+      `Kadar: ${karat}K\n` +
+      `Harga acuan: ${formatIDR(pricePerGram)}\n` +
+      `Estimasi: ${formatIDR(estimate)}`
+  );
 
   useEffect(() => {
     const track = trackRef.current;
@@ -123,6 +193,87 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    document.documentElement.classList.add('js');
+    const nodes = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.16 }
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove('js');
+    };
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 768) setMobileNavOpen(false);
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    const onWhatsappClick = (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest('a[href*="wa.me"]');
+      if (!link || typeof window.gtag !== 'function') return;
+
+      const section = link.closest('section[id]')?.id || (link.classList.contains('float-wa') ? 'floating' : 'global');
+      const label = link.getAttribute('aria-label') || link.textContent?.trim() || 'whatsapp_link';
+
+      window.gtag('event', 'whatsapp_click', {
+        event_category: 'engagement',
+        event_label: label,
+        section,
+        link_url: link.href
+      });
+      window.gtag('event', 'start_whatsapp', {
+        event_category: 'conversion',
+        event_label: label,
+        section
+      });
+    };
+
+    document.addEventListener('click', onWhatsappClick);
+    return () => document.removeEventListener('click', onWhatsappClick);
+  }, []);
+
+  useEffect(() => {
+    const estimatorSection = document.getElementById('estimasi');
+    if (!estimatorSection || typeof window.gtag !== 'function') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !estimatorViewed) {
+            window.gtag('event', 'view_estimator', {
+              event_category: 'engagement',
+              event_label: 'estimasi_section'
+            });
+            setEstimatorViewed(true);
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    observer.observe(estimatorSection);
+    return () => observer.disconnect();
+  }, [estimatorViewed]);
+
   return (
     <div className="page">
       <header>
@@ -131,20 +282,31 @@ export default function App() {
             <img src="/img/logo.png" alt="Central Jual Emas" />
             <span>Central Jual Emas</span>
           </div>
-          <nav>
-            <a href="#home">Home</a>
-            <a href="#layanan">Layanan</a>
-            <a href="#estimasi">Estimasi</a>
-            <a href="#testimoni">Testimoni</a>
-            <a href="#faq">FAQ</a>
-            <a href="#kontak">Kontak</a>
+          <button
+            type="button"
+            className={`menu-toggle ${mobileNavOpen ? 'open' : ''}`}
+            aria-label="Toggle navigation"
+            aria-expanded={mobileNavOpen}
+            onClick={() => setMobileNavOpen((prev) => !prev)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <nav className={mobileNavOpen ? 'open' : ''}>
+            <a href="#home" onClick={() => setMobileNavOpen(false)}>Home</a>
+            <a href="#layanan" onClick={() => setMobileNavOpen(false)}>Layanan</a>
+            <a href="#estimasi" onClick={() => setMobileNavOpen(false)}>Estimasi</a>
+            <a href="#testimoni" onClick={() => setMobileNavOpen(false)}>Testimoni</a>
+            <a href="#faq" onClick={() => setMobileNavOpen(false)}>FAQ</a>
+            <a href="#kontak" onClick={() => setMobileNavOpen(false)}>Kontak</a>
           </nav>
         </div>
       </header>
 
       <section id="home" className="hero section">
         <div className="hero-content container">
-          <div className="hero-text">
+          <div className="hero-text reveal">
             <span className="eyebrow">Pusat Jual Emas Terpercaya</span>
             <h1>
               Jual Emas Cepat &amp; <span>Aman</span>
@@ -176,7 +338,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="hero-visual">
+          <div className="hero-visual reveal" style={{ '--delay': '120ms' }}>
             <div className="glass-panel">
               <p className="tag">Premium Service</p>
               <h3>Harga &amp; Keamanan Utama</h3>
@@ -200,8 +362,8 @@ export default function App() {
             Standar pelayanan premium untuk memastikan pengalaman jual emas yang elegan dan nyaman.
           </p>
           <div className="services">
-            {services.map((item) => (
-              <div key={item.title} className="service">
+            {services.map((item, i) => (
+              <div key={item.title} className="service reveal" style={{ '--delay': `${i * 90}ms` }}>
                 <span className="iconify" data-icon={item.icon}></span>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
@@ -254,7 +416,8 @@ export default function App() {
                   type="number"
                   min="1"
                   value={grams}
-                  onChange={(e) => setGrams(Number(e.target.value))}
+                  inputMode="numeric"
+                  onChange={(e) => setGrams(Math.max(0, Number(e.target.value) || 0))}
                 />
               </label>
               <label>
@@ -264,7 +427,8 @@ export default function App() {
                   min="1"
                   max="24"
                   value={karat}
-                  onChange={(e) => setKarat(Number(e.target.value))}
+                  inputMode="numeric"
+                  onChange={(e) => setKarat(Number(e.target.value) || 0)}
                 />
               </label>
               <label>
@@ -273,16 +437,22 @@ export default function App() {
                   type="number"
                   min="1000"
                   value={pricePerGram}
-                  onChange={(e) => setPricePerGram(Number(e.target.value))}
+                  inputMode="numeric"
+                  onChange={(e) => setPricePerGram(Math.max(0, Number(e.target.value) || 0))}
                 />
               </label>
               <div className="estimate">
                 <span>Estimasi</span>
                 <strong>{formatIDR(estimate)}</strong>
               </div>
+              <p className={`estimate-note ${isEstimateValid ? 'ok' : ''}`}>{estimateNote}</p>
               <a
-                className="btn"
-                href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20estimasi%20harga"
+                className={`btn ${!isEstimateValid ? 'btn-disabled' : ''}`}
+                href={
+                  isEstimateValid
+                    ? `https://wa.me/6285219542001?text=${waEstimateText}`
+                    : '#estimasi'
+                }
                 target="_blank"
                 rel="noreferrer"
               >
@@ -300,8 +470,9 @@ export default function App() {
             Nuansa elegan, pencahayaan hangat, dan privasi terbaik untuk Anda.
           </p>
           <div className="gallery-grid">
-            {gallery.map((item) => (
-              <div key={item.title} className="gallery-card">
+            {gallery.map((item, i) => (
+              <div key={item.title} className="gallery-card reveal" style={{ '--delay': `${i * 90}ms` }}>
+                <img src={item.image} alt={item.alt} loading="lazy" />
                 <div className="gallery-overlay"></div>
                 <div className="gallery-content">
                   <span>{item.tag}</span>
@@ -319,8 +490,8 @@ export default function App() {
           <p className="subtitle">Testimoni nyata dari pelanggan yang sudah merasakan layanan premium kami.</p>
           <div className="testimonial-wrapper" ref={wrapRef}>
             <div className="testimonial-track" ref={trackRef}>
-              {testimonials.map((item) => (
-                <div key={item.name + item.city} className="testimonial-card">
+              {testimonials.map((item, i) => (
+                <div key={item.name + item.city} className="testimonial-card reveal" style={{ '--delay': `${i * 80}ms` }}>
                   <p>"{item.quote}"</p>
                   <span>
                     &mdash; {item.name}, {item.city}
@@ -338,12 +509,15 @@ export default function App() {
             <div>
               <h2>Jaringan Cabang Premium</h2>
               <p className="subtitle">
-                Tersedia di lokasi strategis dengan akses mudah dan area parkir luas.
+                Berlokasi utama di Serang, Banten dan melayani area Jabodetabek dengan janji temu.
               </p>
+              <a className="area-link" href="/layanan-jabodetabek.html">
+                Lihat Detail Layanan Serang & Jabodetabek
+              </a>
             </div>
             <div className="branch-grid">
-              {branches.map((branch) => (
-                <div key={branch.city} className="branch-card">
+              {branches.map((branch, i) => (
+                <div key={branch.city} className="branch-card reveal" style={{ '--delay': `${i * 90}ms` }}>
                   <h4>{branch.city}</h4>
                   <p>{branch.address}</p>
                 </div>
@@ -360,8 +534,19 @@ export default function App() {
             {faqs.map((item, index) => (
               <button
                 key={item.q}
-                className={`faq-item ${openFaq === index ? 'open' : ''}`}
-                onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
+                className="faq-item reveal"
+                style={{ '--delay': `${index * 90}ms` }}
+                aria-expanded={openFaq === index}
+                onClick={() => {
+                  const isOpening = openFaq !== index;
+                  setOpenFaq(isOpening ? index : -1);
+                  if (isOpening && typeof window.gtag === 'function') {
+                    window.gtag('event', 'faq_open', {
+                      event_category: 'engagement',
+                      event_label: item.q
+                    });
+                  }
+                }}
               >
                 <div>
                   <h4>{item.q}</h4>
@@ -378,11 +563,29 @@ export default function App() {
         <div className="container social-wrap">
           <div>
             <h2>Lihat Aktivitas Kami</h2>
-            <p className="subtitle">Ikuti update promo dan aktivitas harian kami di media sosial.</p>
+            <p className="subtitle">Berlokasi di Serang, Banten. Layanan kami menjangkau Jabodetabek setiap hari.</p>
           </div>
           <div className="social-btns">
             <a href="https://www.tiktok.com/@terima.jual_emas">TikTok @centraljualemas</a>
             <a href="https://www.facebook.com/jualemastanpasurat">Facebook Central Jual Emas</a>
+          </div>
+        </div>
+      </section>
+
+      <section className="section trust">
+        <div className="container">
+          <h2>Keamanan & Kepercayaan</h2>
+          <p className="subtitle">
+            Kami prioritaskan kenyamanan pelanggan dari proses awal sampai dana cair.
+          </p>
+          <div className="trust-grid">
+            {trustPoints.map((item, i) => (
+              <article key={item.title} className="trust-card reveal" style={{ '--delay': `${i * 80}ms` }}>
+                <span className="iconify" data-icon={item.icon}></span>
+                <h4>{item.title}</h4>
+                <p>{item.desc}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -415,6 +618,24 @@ export default function App() {
         aria-label="Chat WhatsApp"
       >
         <span className="iconify" data-icon="mdi:whatsapp"></span>
+      </a>
+
+      <a
+        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20konsultasi%20cepat"
+        className="mobile-cta"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Konsultasi Cepat via WhatsApp
+      </a>
+
+      <a
+        href="https://wa.me/6285219542001?text=Halo%20Central%20Jual%20Emas,%20saya%20ingin%20konsultasi%20harga%20emas"
+        className="desktop-cta"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Konsultasi Harga Emas Sekarang
       </a>
     </div>
   );
