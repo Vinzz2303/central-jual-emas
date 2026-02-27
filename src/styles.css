@@ -291,6 +291,56 @@ h2{
   font-size:12px;
   color:#6b6359;
 }
+.market-card{
+  margin-top:24px;
+  background:#fff;
+  border:1px solid #eadfcf;
+  border-radius:16px;
+  padding:18px;
+  box-shadow:0 14px 30px rgba(25,18,12,.08);
+}
+.market-label{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:1.3px;
+  color:#8a7f70;
+}
+.market-value{
+  margin-top:6px;
+  font-family:"Playfair Display",Georgia,serif;
+  font-size:36px;
+  color:#191510;
+  line-height:1.2;
+}
+.market-value span{
+  margin-left:6px;
+  font-size:16px;
+  color:#7a7065;
+}
+.market-updated{
+  margin-top:10px;
+  font-size:13px;
+  color:#5e5549;
+}
+.market-formula{
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px dashed #dfd4c4;
+}
+.market-formula h3{
+  font-size:14px;
+  margin-bottom:6px;
+}
+.market-formula p{
+  font-size:13px;
+  color:#5a5147;
+}
+.market-source{
+  margin-top:10px;
+  font-size:12px;
+  color:#7f7468;
+  text-transform:capitalize;
+}
 .calculator{
   background:#fff;
   border:1px solid #eadfcf;
@@ -595,6 +645,7 @@ footer h4, footer h5{color:#fff;margin-bottom:8px}
   .hero h1{font-size:34px}
   .btn{width:100%;text-align:center}
   .hero-metrics{grid-template-columns:1fr}
+  .market-value{font-size:30px}
   .mobile-cta{
     display:block;
     position:fixed;

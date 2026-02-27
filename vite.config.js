@@ -8,7 +8,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        layananJabodetabek: resolve(__dirname, 'layanan-jabodetabek.html')
+        layananJabodetabek: resolve(__dirname, 'layanan-jabodetabek.html'),
+        admin: resolve(__dirname, 'admin.html')
       }
     }
   },

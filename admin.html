@@ -1,0 +1,160 @@
+﻿<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin Dashboard | Central Jual Emas</title>
+    <style>
+      :root { --bg:#0f0b10; --panel:#1b1419; --line:#2a2226; --gold:#e3c77a; --text:#efe8db; --muted:#c8c0b4; }
+      * { box-sizing:border-box; }
+      body { margin:0; font-family:Segoe UI, Arial, sans-serif; background:var(--bg); color:var(--text); }
+      .wrap { max-width:1100px; margin:0 auto; padding:26px 18px 40px; }
+      h1 { margin:0 0 6px; font-size:28px; }
+      .sub { color:var(--muted); margin-bottom:20px; }
+      .panel { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:14px; }
+      .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+      input { background:#120e13; border:1px solid #3a2f35; color:var(--text); border-radius:10px; padding:10px 12px; min-width:280px; }
+      button { border:none; border-radius:10px; background:var(--gold); color:#1b1419; padding:10px 14px; font-weight:700; cursor:pointer; }
+      table { width:100%; border-collapse:collapse; margin-top:12px; }
+      th, td { border-bottom:1px solid #31272d; padding:10px 8px; text-align:left; font-size:14px; }
+      th { color:#d7c796; font-weight:600; }
+      .muted { color:var(--muted); font-size:13px; }
+      .pill { display:inline-block; border:1px solid #4a3c28; color:#d7c796; border-radius:999px; padding:4px 9px; font-size:12px; }
+      .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
+      .stat { background:#140f13; border:1px solid #2f2630; border-radius:12px; padding:12px; }
+      .stat h3 { margin:0; font-size:22px; color:var(--gold); }
+      .stat p { margin:4px 0 0; color:var(--muted); font-size:12px; }
+      .hide { display:none; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <h1>Admin Dashboard</h1>
+      <p class="sub">Monitoring lead WhatsApp dari website.</p>
+
+      <section class="panel">
+        <div class="row">
+          <input id="token" type="password" placeholder="ADMIN_TOKEN (opsional jika belum diset)" />
+          <button id="loadBtn" type="button">Muat Data</button>
+          <span id="status" class="muted">Belum memuat data.</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="stats">
+          <div class="stat"><h3 id="total">0</h3><p>Total Lead</p></div>
+          <div class="stat"><h3 id="today">0</h3><p>Lead Hari Ini</p></div>
+          <div class="stat"><h3 id="estimasi">0</h3><p>Dari Estimasi</p></div>
+          <div class="stat"><h3 id="floating">0</h3><p>Dari Floating CTA</p></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="row" style="justify-content:space-between;">
+          <span class="pill">Lead Terbaru</span>
+          <span class="muted">Data ditampilkan dari endpoint API internal.</span>
+        </div>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Section</th>
+                <th>Label</th>
+                <th>Gram</th>
+                <th>Karat</th>
+                <th>Estimasi</th>
+              </tr>
+            </thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const fmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+      const idr = (n) => fmt.format(Number(n) || 0);
+
+      const byId = (id) => document.getElementById(id);
+      const statusEl = byId('status');
+      const rowsEl = byId('leadRows');
+
+      function render(leads) {
+        byId('total').textContent = String(leads.length);
+
+        const todayDate = new Date().toDateString();
+        byId('today').textContent = String(leads.filter((x) => new Date(x.createdAt).toDateString() === todayDate).length);
+        byId('estimasi').textContent = String(leads.filter((x) => x.section === 'estimasi').length);
+        byId('floating').textContent = String(leads.filter((x) => x.section === 'floating').length);
+
+        if (!leads.length) {
+          rowsEl.innerHTML = '<tr><td colspan="6" class="muted">Belum ada data lead.</td></tr>';
+          return;
+        }
+
+        rowsEl.innerHTML = leads
+          .map((lead) => {
+            const t = new Date(lead.createdAt);
+            const time = Number.isNaN(t.getTime()) ? '-' : t.toLocaleString('id-ID');
+            return `<tr>
+              <td>${time}</td>
+              <td>${lead.section || '-'}</td>
+              <td>${lead.label || '-'}</td>
+              <td>${lead.grams || 0}</td>
+              <td>${lead.karat || 0}</td>
+              <td>${idr(lead.estimate)}</td>
+            </tr>`;
+          })
+          .join('');
+      }
+
+      async function loadLeads() {
+        try {
+          statusEl.textContent = 'Memuat data...';
+          const token = byId('token').value.trim();
+          const endpoints = [
+            token ? `/api/leads?token=${encodeURIComponent(token)}` : '/api/leads',
+            token ? `/.netlify/functions/leads?token=${encodeURIComponent(token)}` : '/.netlify/functions/leads'
+          ];
+
+          let res = null;
+          for (const endpoint of endpoints) {
+            try {
+              const attempt = await fetch(endpoint);
+              if (attempt.ok || attempt.status === 401) {
+                res = attempt;
+                break;
+              }
+            } catch (err) {
+              // try next endpoint
+            }
+          }
+
+          if (!res) {
+            statusEl.textContent =
+              window.location.hostname === 'localhost'
+                ? 'API tidak tersedia di Vite dev. Jalankan via Netlify (`netlify dev`) atau buka URL deploy.'
+                : 'Gagal memuat data dari API.';
+            return;
+          }
+
+          if (!res.ok) {
+            statusEl.textContent = res.status === 401 ? 'Unauthorized. Isi token admin yang benar.' : 'Gagal memuat data.';
+            return;
+          }
+
+          const data = await res.json();
+          render(Array.isArray(data.leads) ? data.leads : []);
+          statusEl.textContent = 'Data berhasil dimuat.';
+        } catch (err) {
+          statusEl.textContent = 'Terjadi error koneksi API.';
+        }
+      }
+
+      byId('loadBtn').addEventListener('click', loadLeads);
+      loadLeads();
+    </script>
+  </body>
+</html>

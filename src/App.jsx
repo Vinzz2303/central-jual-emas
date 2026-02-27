@@ -89,38 +89,38 @@ const gallery = [
   {
     title: 'Ruang Tamu VIP',
     tag: 'Private Lounge',
-    image: '/img/gallery/lounge.svg',
-    alt: 'Ilustrasi ruang tamu VIP untuk konsultasi privat'
+    image: '/img/gallery/lounge.png',
+    alt: 'Ruang tamu VIP bernuansa hangat untuk konsultasi privat'
   },
   {
     title: 'Meja Penilaian',
     tag: 'Precision Desk',
-    image: '/img/gallery/assessment.svg',
-    alt: 'Ilustrasi meja penilaian emas dengan alat presisi'
+    image: '/img/gallery/assessment.png',
+    alt: 'Meja penilaian emas dengan timbangan presisi dan alat uji'
   },
   {
     title: 'Area Konsultasi',
     tag: 'Calm & Quiet',
-    image: '/img/gallery/consultation.svg',
-    alt: 'Ilustrasi area konsultasi dengan suasana tenang'
+    image: '/img/gallery/consultation.png',
+    alt: 'Area konsultasi tenang dengan dokumen transaksi pelanggan'
   },
   {
     title: 'Showcase Kadar',
     tag: 'Verified Purity',
-    image: '/img/gallery/showcase.svg',
-    alt: 'Ilustrasi showcase kadar emas dengan pencahayaan premium'
+    image: '/img/gallery/showcase.png',
+    alt: 'Showcase kadar emas dengan sertifikat verifikasi kemurnian'
   },
   {
     title: 'Spot Foto Premium',
     tag: 'Brand Experience',
-    image: '/img/gallery/brand.svg',
-    alt: 'Ilustrasi spot foto premium di dalam showroom'
+    image: '/img/gallery/brand.png',
+    alt: 'Spot foto premium dengan logo Central Jual Emas'
   },
   {
     title: 'Area Pembayaran',
     tag: 'Instant Transfer',
-    image: '/img/gallery/payment.svg',
-    alt: 'Ilustrasi area pembayaran instan dan aman'
+    image: '/img/gallery/payment.png',
+    alt: 'Area pembayaran instan menggunakan mesin EDC'
   }
 ];
 
@@ -131,13 +131,18 @@ const formatIDR = (value) =>
     maximumFractionDigits: 0
   }).format(value || 0);
 
+const OUNCE_TO_GRAM = 31.1034768;
+
 export default function App() {
   const [grams, setGrams] = useState(10);
   const [karat, setKarat] = useState(24);
   const [pricePerGram, setPricePerGram] = useState(1150000);
+  const [priceSource, setPriceSource] = useState('manual-default');
   const [openFaq, setOpenFaq] = useState(0);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [estimatorViewed, setEstimatorViewed] = useState(false);
+  const [priceStatus, setPriceStatus] = useState('idle');
+  const [priceUpdatedAt, setPriceUpdatedAt] = useState('');
   const trackRef = useRef(null);
   const wrapRef = useRef(null);
 
@@ -160,6 +165,76 @@ export default function App() {
       `Harga acuan: ${formatIDR(pricePerGram)}\n` +
       `Estimasi: ${formatIDR(estimate)}`
   );
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchLivePriceFromPublicApis = async () => {
+      const [goldResponse, fxResponse] = await Promise.all([
+        fetch('https://api.gold-api.com/price/XAU', { signal: controller.signal }),
+        fetch('https://open.er-api.com/v6/latest/USD', { signal: controller.signal })
+      ]);
+      if (!goldResponse.ok || !fxResponse.ok) throw new Error('Public API failed');
+
+      const [goldData, fxData] = await Promise.all([goldResponse.json(), fxResponse.json()]);
+      const xauUsdPerOunce = Number(goldData?.price);
+      const usdIdrRate = Number(fxData?.rates?.IDR);
+      const calculatedPricePerGram = Math.round((xauUsdPerOunce * usdIdrRate) / OUNCE_TO_GRAM);
+
+      if (!Number.isFinite(calculatedPricePerGram) || calculatedPricePerGram <= 0) {
+        throw new Error('Invalid public API payload');
+      }
+
+      return {
+        pricePerGram: calculatedPricePerGram,
+        source: 'direct-public-api-xau-usdidr',
+        updatedAt: new Date().toISOString()
+      };
+    };
+
+    const loadGoldPrice = async () => {
+      try {
+        setPriceStatus('loading');
+        const response = await fetch('/api/gold-price', { signal: controller.signal });
+        if (response.ok) {
+          const data = await response.json();
+          if (!isMounted) return;
+
+          const apiPrice = Number(data.pricePerGram);
+          if (Number.isFinite(apiPrice) && apiPrice > 0) {
+            setPricePerGram(apiPrice);
+            setPriceSource(String(data.source || 'manual-default'));
+            setPriceUpdatedAt(String(data.updatedAt || ''));
+            setPriceStatus('ready');
+            return;
+          }
+        }
+      } catch (error) {
+        if (controller.signal.aborted) return;
+      }
+
+      try {
+        const publicData = await fetchLivePriceFromPublicApis();
+        if (!isMounted) return;
+        setPricePerGram(publicData.pricePerGram);
+        setPriceSource(publicData.source);
+        setPriceUpdatedAt(publicData.updatedAt);
+        setPriceStatus('ready');
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setPriceStatus('fallback');
+      }
+    };
+
+    loadGoldPrice();
+    const intervalId = window.setInterval(loadGoldPrice, 120000);
+    return () => {
+      isMounted = false;
+      controller.abort();
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -245,11 +320,27 @@ export default function App() {
         event_label: label,
         section
       });
+
+      fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          section,
+          label,
+          linkUrl: link.href,
+          grams,
+          karat,
+          estimate
+        })
+      }).catch(() => {
+        // No-op: lead capture should never block navigation to WhatsApp.
+      });
     };
 
     document.addEventListener('click', onWhatsappClick);
     return () => document.removeEventListener('click', onWhatsappClick);
-  }, []);
+  }, [grams, karat, estimate]);
 
   useEffect(() => {
     const estimatorSection = document.getElementById('estimasi');
@@ -274,12 +365,27 @@ export default function App() {
     return () => observer.disconnect();
   }, [estimatorViewed]);
 
+  const formattedPriceUpdatedAt = priceUpdatedAt
+    ? new Date(priceUpdatedAt).toLocaleString('id-ID', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      })
+    : '';
+
   return (
     <div className="page">
       <header>
         <div className="nav container">
           <div className="logo">
-            <img src="/img/logo.png" alt="Central Jual Emas" />
+            <img
+              src="/img/logo-nav.svg"
+              alt="Central Jual Emas"
+              width="420"
+              height="90"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+            />
             <span>Central Jual Emas</span>
           </div>
           <button
@@ -405,8 +511,30 @@ export default function App() {
               <p className="subtitle">
                 Masukkan berat dan kadar untuk estimasi cepat. Harga per gram dapat Anda sesuaikan.
               </p>
+              <article className="market-card reveal" style={{ '--delay': '60ms' }}>
+                <p className="market-label">Harga Hari Ini</p>
+                <p className="market-value">
+                  {formatIDR(pricePerGram)}
+                  <span>/gram</span>
+                </p>
+                <p className="market-updated">
+                  {priceStatus === 'ready'
+                    ? `Update terakhir: ${formattedPriceUpdatedAt || 'baru saja'}`
+                    : priceStatus === 'loading'
+                      ? 'Memuat harga acuan terbaru...'
+                      : 'Mode fallback aktif. Harga acuan tetap bisa Anda ubah manual.'}
+                </p>
+                <div className="market-formula">
+                  <h3>Cara Hitung Estimasi</h3>
+                  <p>Estimasi = Berat (gram) x Harga acuan x (Karat/24)</p>
+                  <p>Harga final ditentukan setelah uji fisik, berat netto, dan kadar aktual.</p>
+                </div>
+                <p className="market-source">Sumber acuan: {priceSource.replace(/-/g, ' ')}</p>
+              </article>
               <div className="price-note">
-                Update manual sesuai harga pasar hari ini.
+                {priceStatus === 'ready'
+                  ? `Harga otomatis dari API${formattedPriceUpdatedAt ? ` (${formattedPriceUpdatedAt})` : ''}.`
+                  : 'Harga fallback aktif. Anda tetap bisa ubah manual sesuai pasar.'}
               </div>
             </div>
             <div className="calculator">
